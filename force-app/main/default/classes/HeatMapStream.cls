@@ -1,5 +1,5 @@
 public without sharing class HeatMapStream {
-    @AuraEnabled(Cacheable=true)
+    @AuraEnabled
     public static Cottage__c[] getCottages(double priceMin, double priceMax){
         return [SELECT Id,
                     Name,

@@ -1,0 +1,60 @@
+<template>
+
+    <!--TYPE -->
+    <lightning-layout>
+        <lightning-layout-item size="12">
+            <lightning-card title="Cottage Type">
+                <c-toggle-button-group
+                    toggles={typeOptions}
+                    onupdatefilter={updateType}
+                    max-buttons-per-row="2"></c-toggle-button-group>
+            </lightning-card>
+        </lightning-layout-item>
+    </lightning-layout>
+
+    <!--NUMBER OF PEOPLE -->
+    <lightning-layout>
+        <lightning-layout-item size="12">
+            <lightning-card title="Number of People">
+                <c-toggle-button-group
+                    toggles={nrOfPeopleOptions}
+                    onupdatefilter={updateNrOfPeople}
+                    max-buttons-per-row="5"></c-toggle-button-group>
+            </lightning-card>
+        </lightning-layout-item>
+    </lightning-layout>
+    
+    <!--PRICE -->
+    <lightning-layout>
+        <lightning-layout-item size="12">
+            <lightning-card title="Price">
+
+                <!-- MINIMUM -->
+                <div class="slds-align_absolute-center">
+                    <lightning-slider
+                        label="Minimum"
+                        min={priceMinLimit}
+                        max={priceMaxLimit}
+                        step={priceStep}
+                        value={priceMin}
+                        onchange={updatePriceMin}
+                        size="x-small"></lightning-slider>
+                </div>
+
+                <!-- MAXIMUM -->
+                <div class="slds-align_absolute-center">
+                    <lightning-slider
+                        label="Maximum"
+                        min={priceMinLimit}
+                        max={priceMaxLimit}
+                        step={priceStep}
+                        value={priceMax}
+                        onchange={updatePriceMax}
+                        size="x-small"></lightning-slider>
+                </div>
+                    
+            </lightning-card>
+        </lightning-layout-item>
+    </lightning-layout>
+
+</template>

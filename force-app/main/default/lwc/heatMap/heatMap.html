@@ -1,55 +1,79 @@
 <template>
-    <div class="slds-grid slds-wrap slds-p-around_xx-small">
-    <!--new 2021.03.31 -->
-        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-1 slds-border_bottom slds-p-around_xx-small slds-align_absolute-center">
-            <div class="slds-text-heading_medium slds-align_absolute-center">
-                <b>Let op! U belegt buiten AFM-toezicht. Geen vergunningsplicht voor deze activiteit.</b>
-                <img src={headerImage}>
-            </div>
+    <!--
+    <template if:false={mapLoaded}>
+        <div class="exampleHolder">
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
         </div>
-        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-1 slds-border_bottom slds-border_top slds-p-around_xx-small slds-align_left">
-            <img src={logoImage}>
-        </div>
-        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-4 slds-p-around_xx-small">
-            <div class="slds-card slds-p-around_xx-small">
-                <lightning-formatted-text value="FILTERS"></lightning-formatted-text>
-                <div class="slds-card">
-                    <lightning-combobox
-                        name="progress"
-                        label="Park"
-                        value={parkSelection}
-                        options={parkOptions}
-                        onchange={handleParkChange} >
-                    </lightning-combobox>
-                </div>
-                <div class="slds-card">
-                    <lightning-combobox
-                        name="progress"
-                        label="Price Minimum"
-                        value={priceMin}
-                        options={priceOptions}
-                        onchange={handlePriceMinChange} >
-                    </lightning-combobox>
-                </div>
-                <div class="slds-card">
-                    <lightning-combobox
-                        name="progress"
-                        label="Price Maximum"
-                        value={priceMax}
-                        options={priceOptions}
-                        onchange={handlePriceMaxChange} >
-                    </lightning-combobox>
-                </div>
-            </div>
-        </div>
-        <div class="slds-col slds-size_1-of-1 slds-large-size_3-of-4">
-
-            <div class="map-root" id="map" lwc:dom="manual"></div>
+    </template>
+    <template if:true={mapLoaded}>-->
     
+        <div class="slds-grid slds-wrap slds-p-around_xx-small">
+            <!-- AFM BANNER -->
+            <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-1 slds-border_bottom slds-p-around_xx-small slds-align_absolute-center">                
+                <div class="slds-text-heading_medium slds-align_absolute-center">
+                    <b>Let op! U belegt buiten AFM-toezicht. Geen vergunningsplicht voor deze activiteit.</b>
+                    <img src={headerImage}>
+                </div>
+            </div>
+            <!-- CP BANNER -->
+            <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-1 slds-border_bottom slds-border_top slds-p-around_xx-small">                
+                <table>
+                    <tr>
+                        <td align="left">
+                            <img src={logoImage} width="150" height="60">
+                        </td>
+                            <td>
+                            <div class="slds-float_right" style="right:20px;">
+                            <lightning-button icon-name="utility:info_alt" onclick={parkInfo} label="Park Info" variant="success">Park Info</lightning-button>
+                        </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!-- MAIN MAP CONTAINER -->
+            <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-4 slds-p-around_xx-small">
+                <!-- FILTERS -->
+                <div class="slds-card slds-p-around_xx-small">
+                    <lightning-formatted-text value="FILTERS"></lightning-formatted-text>
+                    <div class="slds-card">
+                        <lightning-combobox
+                            name="progress"
+                            label="Park"
+                            value={parkSelection}
+                            options={parkOptions}
+                            onchange={handleParkChange} >
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-card">
+                        <lightning-combobox
+                            name="progress"
+                            label="Price Minimum"
+                            value={priceMin}
+                            options={priceOptions}
+                            onchange={handlePriceMinChange} >
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-card">
+                        <lightning-combobox
+                            name="progress"
+                            label="Price Maximum"
+                            value={priceMax}
+                            options={priceOptions}
+                            onchange={handlePriceMaxChange} >
+                        </lightning-combobox>
+                    </div>
+                </div>
+            </div>
+            <!-- MAP -->
+            <div class="slds-col slds-size_1-of-1 slds-large-size_3-of-4">
+                <div class="map-root" id="map" lwc:dom="manual"></div>        
+            </div>
         </div>
-    </div>
+    <!--</template>-->
 
+    <!-- SINGLE COTTAGE POPUP MODAL -->
     <template if:true={isModalOpen}>
+        <template if:true={cottageAvailable}>
         <!-- Modal/Popup Box LWC starts here -->
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
             <div class="slds-modal__container">
@@ -84,41 +108,34 @@
                         <p></p>
                         <div class="slds-grid slds-wrap slds-gutters">
 
-                            <div class="slds-col slds-size_1-of-1 slds-large-size_2-of-5">
+                            <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
                                 <!-- start -->
-                                <div class="slds-box slds-box_x-small slds-text-align_center slds-m-top_x-small">Basic Carousel
+                                <div class="slds-box slds-box_x-small slds-text-align_center slds-m-top_x-small">
                                     <lightning-carousel>
                                         <lightning-carousel-image
-                                            src = "https://reserveren.centerparcs-vastgoed.nl/media/type/152/1024x768-aster-plat-entreezijde.jpg"
-                                            header = "First Card"
-                                            description = "First card description."
-                                            alternative-text = "First card accessible description."
-                                            href = "javascript:void(0);">
+                                            header="Impressie #1"
+                                            src = {appResources.image1}>
                                         </lightning-carousel-image>
                                         <lightning-carousel-image
-                                            src = "https://reserveren.centerparcs-vastgoed.nl/media/type/152/1024x768-aster-plat-entreezijde.jpg"
-                                            header = "Second Card"
-                                            description = "Second card description."
-                                            alternative-text = "Second card accessible description."
-                                            href = "javascript:void(0);">
+                                        header="Impressie #2"
+                                            src = {appResources.image2}>
                                         </lightning-carousel-image>
                                         <lightning-carousel-image
-                                            src = "https://reserveren.centerparcs-vastgoed.nl/media/type/152/1024x768-aster-plat-entreezijde.jpg"
-                                            header = "Third Card"
-                                            description = "Third card description."
-                                            alternative-text = "Third card accessible description."
-                                            href = "javascript:void(0);">
+                                        header="Plattegrond"
+                                            src = {appResources.image3}>
                                         </lightning-carousel-image>
                                     </lightning-carousel>
                                 </div>
                                 <!-- end -->
                             </div>
-                            <div class="slds-col slds-size_1-of-1 slds-large-size_3-of-5">
+                            <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
                                 <div class="slds-m-top_x-small">
                                     <div class="slds-text-heading_medium">{selectedCottage.Name}</div>
                                     <div class="slds-text-heading_small">America, NL</div>
                                     <br>
-                                    <div>{selectedCottage.Of_Persons__c}-pers. Comfort cottage, type Aster-C5. Vloeroppervlakte: <lightning-formatted-number value={selectedCottage.Floor_Space_m2__c} minimum-fraction-digits="2"></lightning-formatted-number> m², kavel: {selectedCottage.Ground_Surface_m2__c} m²</div>
+                                    <div>
+                                        {selectedCottage.Of_Persons__c}-pers. Comfort cottage, type Aster-C5.<br>
+                                        Vloeroppervlakte: <lightning-formatted-number value={selectedCottage.Floor_Space_m2__c} minimum-fraction-digits="2"></lightning-formatted-number> m², kavel: {selectedCottage.Ground_Surface_m2__c} m²</div>
                                     <br>
                                     <div class="slds-text-heading_medium"><lightning-formatted-number value={selectedCottage.Total_Price_excl_Discount__c} format-style="currency" currency-code="EUR" minimum-fraction-digits="2" maximum-fraction-digits="2"></lightning-formatted-number></div>
                                     <div class="slds-text-heading_small">excl. BTW, incl. vernieuwing</div>
@@ -131,14 +148,16 @@
                     <template if:true={stepTwo}>                        
                     <lightning-record-edit-form
                         object-api-name="Lead"
-                        onsubmit={handleSubmit}
-                    >
-                        <lightning-messages></lightning-messages>
-                        <lightning-input-field field-name="FirstName" value={userFirstName}> </lightning-input-field>
-                        <lightning-input-field field-name="LastName" value={userLastName}> </lightning-input-field>
-                        <lightning-input-field field-name="Email" value={userEmail}> </lightning-input-field>
-                        <lightning-input-field field-name="Phone"> </lightning-input-field>
-                        <lightning-input-field field-name="Company"> </lightning-input-field>
+                        onsubmit={handleSubmit}>
+                        <lightning-messages data-id='formerror'></lightning-messages>
+                        <lightning-input-field field-name="FirstName" value={userFirstName} required="true"> </lightning-input-field>
+                        <lightning-input-field field-name="LastName" value={userLastName} required="true"> </lightning-input-field>
+                        <lightning-input-field field-name="Email" value={userEmail} required="true"> </lightning-input-field>
+                        <lightning-input-field field-name="Street" value={userStreet} required="true"> </lightning-input-field>
+                        <lightning-input-field field-name="PostalCode" value={userPostalCode} required="true"> </lightning-input-field>
+                        <lightning-input-field field-name="City" value={userCity} required="true"> </lightning-input-field>
+                        <lightning-input-field field-name="Country" value={userCountry} required="true"> </lightning-input-field>
+                        <lightning-input-field field-name="Phone" value={userPhone} required="true"> </lightning-input-field>
                         
                         <div class="slds-float_right">
                             <button class="slds-button slds-button_neutral" type="button" onclick={goBack} title="Back">Terug</button>
@@ -154,6 +173,7 @@
                     </template>
                 </div>
 
+                <template if:false={stepTwo}>
                 <!-- Modal/Popup Box LWC body : footer -->
                 <footer class="slds-modal__footer">
                     <template if:true={stepOne}>
@@ -165,8 +185,52 @@
                         <button class="slds-button slds-button_brand" onclick={closeModal} title="Sluiten">Sluiten</button>                    
                     </template>
                 </footer>
+            </template>
             </div>
         </section>
+        </template>
+        <template if:false={cottageAvailable}>
+
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Reserveer een Cottage</h2>
+                </header>
+
+                <!-- Modal/Popup Box LWC body starts here -->
+                <template if:true={cottageSold}>
+                    <div class="slds-modal__content slds-p-around_medium">
+                                <div style="padding:0.5rem;background:#ff1e00">
+                                    <h2 class="slds-text-color_inverse">Deze kavel is helaas reeds verkocht en niet langer beschikbaar!</h2>
+                                </div>
+                    </div>
+                </template>
+                <template if:false={cottageSold}>
+                    <div class="slds-modal__content slds-p-around_medium">
+                                <div style="padding:0.5rem;background:#ffffffaf">
+                                    <h2>Deze kavel is helaas nog niet beschikbaar .</h2>
+                                </div>
+                    </div>
+                </template>
+
+                <!-- Modal/Popup Box LWC body : footer -->
+                <footer class="slds-modal__footer">
+					<button class="slds-button slds-button_brand" onclick={closeModal} title="Sluiten">Sluiten</button>     
+                </footer>
+            </div>
+        </section>
+
+        </template>
         <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
 </template>
