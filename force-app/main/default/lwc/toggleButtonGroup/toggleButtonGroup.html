@@ -1,0 +1,9 @@
+<template>
+    <div class="slds-grid slds-gutters slds-wrap slds-align_absolute-center">
+        <template for:each={toggles} for:item="toggle">
+            <div class={buttonsPerRowMax} key={toggle.label}>
+                <c-toggle-button key={toggle.label} toggle-label={toggle.label} toggle-on={toggle.value} onbuttontoggled={handleToggle}></c-toggle-button>
+            </div>
+        </template>
+    </div>
+</template>

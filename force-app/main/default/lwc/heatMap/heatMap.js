@@ -1,27 +1,31 @@
 import { LightningElement, track,api, wire } from 'lwc';
 import leafletjs from '@salesforce/resourceUrl/leaflet';
-import jsonData from '@salesforce/resourceUrl/stateData';
 import IMAGES from '@salesforce/resourceUrl/Images';
 import cottageData from '@salesforce/resourceUrl/cottageData';
+import cottageImages from '@salesforce/resourceUrl/CottageImages';
 import { loadStyle, loadScript} from 'lightning/platformResourceLoader';
 import getCottages from '@salesforce/apex/HeatMapStream.getCottages';
+
 //new apr7
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import USER_ID from '@salesforce/user/Id';
 import FIRST_NAME_FIELD from '@salesforce/schema/User.FirstName';
 import LAST_NAME_FIELD from '@salesforce/schema/User.LastName';
 import EMAIL_FIELD from '@salesforce/schema/User.Email';
-const USER_FIELDS = [FIRST_NAME_FIELD,LAST_NAME_FIELD,EMAIL_FIELD];
+import STREET_FIELD from '@salesforce/schema/User.Street';
+import POSTALCODE_FIELD from '@salesforce/schema/User.PostalCode';
+import CITY_FIELD from '@salesforce/schema/User.City';
+import COUNTRY_FIELD from '@salesforce/schema/User.Country';
+import PHONE_FIELD from '@salesforce/schema/User.Phone';
+const USER_FIELDS = [FIRST_NAME_FIELD,LAST_NAME_FIELD,EMAIL_FIELD,STREET_FIELD,POSTALCODE_FIELD,CITY_FIELD,COUNTRY_FIELD,PHONE_FIELD];
 
-const LIMBURG = 'limburgsPerceel';
+const LIMBURG = 'limburgsePeel';
 const EEMHOF = 'deEemhof';
 
 export default class HeatMap extends LightningElement {
     @track isModalOpen = false;
     @track stepNr=1;
-    @api mapLoaded = false;
-
-    @track theRecord = {};
+    @track mapLoaded = false;
 
     cottages = [];
     @api selectedCottage;
@@ -39,39 +43,46 @@ export default class HeatMap extends LightningElement {
 
     //new apr1
     parkSelection = LIMBURG;
-    parkSelectionLocation = [51.449069, 5.964670];
-    parkLimburg = [51.449069, 5.964670];
+    parkSelectionLocation = [51.449213, 5.964885];
+    parkLimburg = [51.449213, 5.964885];
     parkEemhof = [52.260156, 5.401960];
-/*
-    get parkOptions(){
-        return [
-            { label: 'Limburgs Perceel', value: [51.449069, 5.964670] },
-            { label: 'De Eemhof', value: [52.260156, 5.401960] },
-        ];
-    }*/
 
     //new apr7
     userEmail;
     userFirstName;
     userLastName;
+    userStreet;
+    userPostalCode;
+    userCity;
+    userCountry;
+    userPhone;
+
+    //new jun1
+    appResources = {
+		image1: `${cottageImages}/image1.jpg`,
+		image2: `${cottageImages}/image2.jpg`,
+		image3: `${cottageImages}/image3.png`,
+	};
 
     @wire(getRecord, { recordId: USER_ID, fields: USER_FIELDS})
     wireuser({error,data}) {
         if (error) {
            this.error = error ; 
         } else if (data) {
-            //this.emailUser = data.fields.Email.value;
-            //this.nameUser = data.fields.Name.value;
             this.userEmail = getFieldValue(data, EMAIL_FIELD);
             this.userFirstName = getFieldValue(data, FIRST_NAME_FIELD);
             this.userLastName = getFieldValue(data, LAST_NAME_FIELD);
-
+            this.userStreet = getFieldValue(data, STREET_FIELD);
+            this.userPostalCode = getFieldValue(data, POSTALCODE_FIELD);
+            this.userCity = getFieldValue(data, CITY_FIELD);
+            this.userCountry = getFieldValue(data, COUNTRY_FIELD);
+            this.userPhone = getFieldValue(data, PHONE_FIELD);
         }
     }
 
-    @api get parkOptions(){
+    get parkOptions(){
         return [
-            { label: 'Limburgs Perceel', value: LIMBURG },
+            { label: 'Limburgse Peel', value: LIMBURG },
             { label: 'De Eemhof', value: EEMHOF },
         ];
     }
@@ -87,6 +98,7 @@ export default class HeatMap extends LightningElement {
         ];
     }
 
+    //filters
     handlePriceMinChange(event) {
         this.priceMin = event.detail.value;
         this.initLeaflet(this);
@@ -96,13 +108,7 @@ export default class HeatMap extends LightningElement {
         this.priceMax = event.detail.value;
         this.initLeaflet(this);
     }
-
-    //new apr1
-/*
-    handleParkChange(event) {
-        this.parkSelectionLocation = event.detail.value;
-        this.initLeaflet(this);
-    }*/
+    
     handleParkChange(event) {
         if(event.detail.value==LIMBURG){
             this.parkSelectionLocation = this.parkLimburg;
@@ -120,6 +126,11 @@ export default class HeatMap extends LightningElement {
                 loadStyle(this, leafletjs+'/leaflet.css'),
             ])
             .then(() => {
+                this.mapLoaded = false;
+                /*
+                setTimeout(() => {
+                    this.initLeaflet(this);         
+                }, 2000);*/
                 this.initLeaflet(this);         
             })
             .catch(error => {
@@ -129,26 +140,25 @@ export default class HeatMap extends LightningElement {
     }
 
     initLeaflet(windowContext){
-        console.log('windowContext.priceMin: '+windowContext.priceMin);
-        console.log('windowContext.priceMax: '+windowContext.priceMax);
         getCottages({priceMin:windowContext.priceMin,  priceMax:windowContext.priceMax})
         .then(result => {
             windowContext.cottages = result;
 
             const heatMap = this.template.querySelector(".map-root");
-            //new march26
+            
             if(windowContext.mapLoaded==true){
-                console.log('got here');
-                //windowContext.mapH.off();
                 windowContext.mapH.remove();
-                //windowContext.mapH.on();
             }
+            //console.log(windowContext.parkSelectionLocation);
 
             var mymap = L.map(heatMap,{tap:false}).setView(windowContext.parkSelectionLocation, 18);
-            windowContext.mapH = mymap;//new march26
-            
+            //var mymap = L.map(heatMap).setView([51.449069, 5.964670], 19);
+            windowContext.mapH = mymap;
 
-            //new mar22           
+            
+        
+        //var mymap = L.map(heatMap).setView([51.449069, 5.964670], 19);
+                    
             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',{    
             //L.tileLayer.wms('https://geodata.nationaalgeoregister.nl/kadastralekaart/wms/v4_0?service=WMS&version=1.3.0',{
             //        layers: 'kadastralekaart,Perceel',         
@@ -169,7 +179,6 @@ export default class HeatMap extends LightningElement {
                 features: []
             }
             
-            console.log("windowContext.cottages.length: "+windowContext.cottages.length);
             for(var i = 0; i<windowContext.cottages.length; i++){
                 for(var j = 0; j<stateDataJson.features.length; j++){
                     if(windowContext.cottages[i].Polygon_Id__c === stateDataJson.features[j].id){
@@ -228,7 +237,6 @@ export default class HeatMap extends LightningElement {
                 windowContext.idToSelectedCottage(e.target.feature.id,windowContext);
                 windowContext.isModalOpen = true;
                 windowContext.stepNr = 1;
-                //console.log("props.avail= "+e.target.feature.properties.availability);
 
             }
             function onEachFeature(feature, layer) {
@@ -258,12 +266,13 @@ export default class HeatMap extends LightningElement {
         }
     }
 
-    //new feb25
+    //modal
     openModal() {
         this.isModalOpen = true;
     }
     closeModal() {
         this.isModalOpen = false;
+        //this.initLeaflet(this);
     }
 
     //new feb26
@@ -274,12 +283,31 @@ export default class HeatMap extends LightningElement {
     goNext() {
         this.stepNr++;
     }
-
-    //new mar3
     handleSubmit(event){
         event.preventDefault();
-        this.template.querySelector('lightning-record-edit-form').submit(event.detail.fields);
+        const fields = event.detail.fields;
+        fields.Created_by_LWC_Map__c = true; // modify a field
+        fields.Reserved_Cottage_Id__c = this.selectedCottage.Id;
+        fields.Lead_Type__c = "Private Customer";
+        fields.Preferred_Language__c = "Dutch";
+        fields.Company = "CPV";
+
+        this.template.querySelector('lightning-record-edit-form').submit(fields);
+
         this.goNext();
+        
+        setTimeout(() => {
+            this.initLeaflet(this);
+        }, 2000);
+    }
+
+    parkInfo(){
+        /*
+        if(this.parkSelectionLocation == this.parkEemhof){
+            window.open("http://google.com");
+        }else{*/
+            window.open("https://www.centerparcs-vastgoed.nl/limburgse-peel");
+        //}
     }
 
     get stepOne(){return this.stepNr == 1};
@@ -288,5 +316,9 @@ export default class HeatMap extends LightningElement {
 
     get cottageAvailable(){
         return this.selectedCottage.Map_Status__c == 'Available';
+    }
+
+    get cottageSold(){
+        return this.selectedCottage.Map_Status__c == 'Sold';
     }
 }

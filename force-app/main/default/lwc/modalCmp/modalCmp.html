@@ -1,0 +1,23 @@
+<template>
+    
+    <!-- Modal/Popup Box LWC starts here -->
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+
+            <!-- Modal/Popup Box LWC header here -->
+            <header class="slds-modal__header">
+                Header
+            </header>
+
+            <!-- Modal/Popup Box LWC body starts here -->
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                Content
+            </div>
+
+            <!-- Modal/Popup Box LWC body : footer -->
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_brand" onclick={closeModal} title="Sluiten">Sluiten</button>    
+            </footer>
+        </div>
+    </section>
+</template>

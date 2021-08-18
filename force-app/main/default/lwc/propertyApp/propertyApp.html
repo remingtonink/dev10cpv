@@ -1,0 +1,72 @@
+<template>
+
+    <lightning-layout>
+        <lightning-layout-item size="12">
+            <!-- AFM Banner -->
+            <div class="slds-border_bottom slds-p-around_xx-small slds-align_absolute-center" id="headerContainer">                
+                <div class="slds-text-heading_medium slds-align_absolute-center">
+                    <b>Let op! U belegt buiten AFM-toezicht. Geen vergunningsplicht voor deze activiteit.</b>
+                    <img src={headerImage}>
+                </div>
+            </div>
+        </lightning-layout-item>            
+    </lightning-layout>
+
+    <lightning-layout>
+        <lightning-layout-item size="12">
+        <!-- Header: Logo + Menu -->            
+            <div class="slds-border_bottom slds-border_top slds-p-around_xx-small" id="menuContainer">                
+                <table>
+                    <tr>
+                        <td align="left">
+                            <img src={logoImage} width="150" height="60">
+                        </td>
+                            <td>
+                            <div class="slds-float_right" style="right:20px;">
+                            <lightning-button icon-name="utility:info_alt" label="Park Info" variant="success">Park Info</lightning-button>
+                        </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </lightning-layout-item>
+    </lightning-layout>
+
+    <lightning-layout>
+        <lightning-layout-item size="2">
+            <!-- Filters -->
+            <div id="filterContainer">
+                <div class="slds-m-around_xx-small slds-float_right">        
+
+                    <lightning-radio-group
+                        name="radioGroup"
+                        options={radioOptions}
+                        value={radioValue}
+                        type="button"
+                        onchange={radioToggle}
+                        slot="action">
+                    </lightning-radio-group>
+                    <c-filters-cmp cottages={cottages} onsetfilters={processFilters}></c-filters-cmp>     
+                </div> 
+            </div>
+        </lightning-layout-item>
+
+        <lightning-layout-item size="10">
+            <!-- Map / List -->
+            <div id="displayContainer">
+                <template if:true={showMap}>
+                    <c-map-cmp stones={cottages} oncottageselect={processCottageSelect}></c-map-cmp>
+                </template>
+                <template if:false={showMap}>
+                    <c-list-cmp stones={cottages} oncottageselect={processCottageSelect}></c-list-cmp>
+                </template>
+            </div> 
+        </lightning-layout-item>
+    </lightning-layout>
+
+    <!-- Modal Popup -->   
+    <template if:true={modalOpened}>
+        <c-modal-cmp onmodalclose={closeModal} selectedcottage={selectedCottage}></c-modal-cmp>
+    </template>
+    
+</template>
